@@ -8,12 +8,13 @@ pipeline {
         }
         stage('Build Image') {
             steps {
+                sh "echo 'CURRENT BRANCH: ${env.GIT_BRANCH}'"
                 // Prüfen, ob das Image überhaupt baubar ist (Sicherheits-Check für PRs)
                 sh 'podman-compose build --no-cache'
             }
         }
         stage('Deploy to VPS') {
-            sh "echo 'DEPLOY BRANCH: ${env.GIT_BRANCH}'"
+            
             // Nur ausführen, wenn auf dem Hauptzweig main!
             when { expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' } }
 
