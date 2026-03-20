@@ -7,7 +7,7 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hallo! Dieser Go-Server nutzt Port 9001 und läuft stabil auf dem VPS! Jenkins Webhook Test...")
+		fmt.Fprintf(w, "Hallo! Dieser Go-Server nutzt Port 9001 und läuft stabil auf dem VPS! An internes Network angebunden. Jenkins Webhook Test...")
 	})
 
 	// Port 9001 für VPS
