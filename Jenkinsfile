@@ -1,30 +1,29 @@
 pipeline {
     agent any
-
     stages {
-        stage('Source Control') {
+        stage('Source & Build Test') {
             steps {
-                // Holt den frischen Code vom GitHub-Branch
                 checkout scm
+                // Prüfen, ob das Image überhaupt baubar ist (Sicherheits-Check für PRs)
+                sh 'podman-compose build'
             }
         }
-
-        stage('Podman Build & Deploy') {
+        stage('Deploy to VPS') {
+            // Nur ausführen, wenn auf dem Hauptzweig main!
+            when { branch 'main' }
             steps {
-                // 1. Das neue, kleine Multi-Stage Image bauen
-                sh 'podman-compose build'
-                
-                // 2. Den alten Container stoppen und den neuen im Hintergrund starten
-                // up -d kümmert sich automatisch um das Ersetzen des alten Containers
+                // Aufräum-Schritt falls Container vorhanden oder läuft 
+                sh 'podman stop go-app-final || true'
+                sh 'podman rm go-app-final || true'
+                // Finales Hochfahren
                 sh 'podman-compose up -d'
             }
         }
-
-        stage('Cleanup') {
-            steps {
-                // Löscht alte, ungenutzte Image-Reste (Dangling Images)
-                sh 'podman image prune -f'
-            }
+    }
+    post {
+        always {
+            // Hält den VPS sauber
+            sh 'podman image prune -f'
         }
     }
 }
