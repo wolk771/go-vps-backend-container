@@ -17,8 +17,7 @@ pipeline {
             when { branch 'main' }
             steps {
                 // Den alten Port-Besetzer wegräumen 
-                sh 'podman stop go-app-final || true'
-                sh 'podman rm -f go-app-final || true'
+                sh 'podman-compose down'
                 // Finales Hochfahren und --force-recreate
                 sh 'podman-compose up -d --force-recreate'
             }
