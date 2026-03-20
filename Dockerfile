@@ -4,9 +4,13 @@ WORKDIR /app
 COPY . .
 RUN go build -o main .
 
-# Stage 2: Final (Nur die Binärdatei)
+# Stage 2: Final
 FROM alpine:latest
 WORKDIR /app
 COPY --from=builder /app/main .
+
+# Standard-Port definieren, falls nichts von außen kommt
+ENV APP_PORT=9001
 EXPOSE 9001
+
 CMD ["./main"]

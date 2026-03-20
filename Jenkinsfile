@@ -6,30 +6,30 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build Image') {
+        stage('Build & Validation') {
             steps {
-                sh "echo 'CURRENT BRANCH: ${env.GIT_BRANCH}'"
-                // Prüfen, ob das Image überhaupt baubar ist (Sicherheits-Check für PRs)
-                sh 'podman-compose build --no-cache'
+                sh "echo 'PROZESS STARTET AUF BRANCH: ${env.GIT_BRANCH}'"
+                // Sicherheit: ohne Cache, um Code-Inkonsistenzen (main.go) zu vermeiden
+                sh 'podman-compose -f docker-compose.yml build --no-cache'
             }
         }
-        stage('Deploy to VPS') {
-            
-            // Nur ausführen, wenn auf dem Hauptzweig main!
+        stage('Safe Deployment') {
+            // Nur auf main ausführen
             when { expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' } }
-
             steps {
-                // Den alten Port-Besetzer wegräumen 
+                sh "echo 'STARTE PROD-DEPLOYMENT...'"
+                
+                // 1. Absolute Port-Garantie: Den alten Container hart beenden
                 sh 'podman-compose -f docker-compose.yml down || true'
-                sh 'podman-compose -f docker-compose.yml build --no-cache'
-                // Finales Hochfahren und --force-recreate
-                sh 'podman-compose -f docker-compose.yml up -d --force-recreate'
+                
+                // 2. Verwendet bereits gebauten Image
+                sh 'podman-compose -f docker-compose.yml up -d --no-build'
             }
         }
     }
     post {
         always {
-            // Hält den VPS sauber
+            // Befreit VPS von übrigen Images
             sh 'podman image prune -f'
         }
     }
