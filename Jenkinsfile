@@ -4,27 +4,26 @@ pipeline {
     stages {
         stage('Source Control') {
             steps {
-                // Jenkins holt sich hier den neuesten Code
+                // Holt den frischen Code vom GitHub-Branch
                 checkout scm
             }
         }
 
-        stage('Podman Build') {
+        stage('Podman Build & Deploy') {
             steps {
-                // das Image neu bauen
-                sh 'podman build -t go-app-v2 .'
+                // 1. Das neue, kleine Multi-Stage Image bauen
+                sh 'podman-compose build'
+                
+                // 2. Den alten Container stoppen und den neuen im Hintergrund starten
+                // up -d kümmert sich automatisch um das Ersetzen des alten Containers
+                sh 'podman-compose up -d'
             }
         }
 
-        stage('Deploy App') {
+        stage('Cleanup') {
             steps {
-                // Zuerst alten Container wegräumen
-                // Das "|| true" verhindert, dass die Pipeline stoppt, falls kein Container da ist
-                sh 'podman stop go-app-final || true'
-                sh 'podman rm go-app-final || true'
-                
-                // Jetzt den neuen Container auf deinem Port 9001 starten
-                sh 'podman run -d --name go-app-final -p 9001:9001 go-app-v2'
+                // Löscht alte, ungenutzte Image-Reste (Dangling Images)
+                sh 'podman image prune -f'
             }
         }
     }

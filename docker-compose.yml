@@ -1,0 +1,14 @@
+services:
+  go-app:
+    build: .
+    image: localhost/go-app-v2:latest
+    container_name: go-app-final
+    restart: always
+    ports:
+      - "9001:9001"
+    networks:
+      - dev_edu-network-dev
+
+networks:
+  dev_edu-network-dev:
+    external: true
