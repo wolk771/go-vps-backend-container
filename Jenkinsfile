@@ -13,8 +13,10 @@ pipeline {
             }
         }
         stage('Deploy to VPS') {
+            sh "echo 'DEPLOY BRANCH: ${env.GIT_BRANCH}'"
             // Nur ausführen, wenn auf dem Hauptzweig main!
-            when { branch 'main' }
+            when { expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' } }
+
             steps {
                 // Den alten Port-Besetzer wegräumen 
                 sh 'podman-compose -f docker-compose.yml down || true'
