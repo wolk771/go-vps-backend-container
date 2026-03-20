@@ -4,6 +4,9 @@ services:
     image: go-app-v2:latest
     container_name: go-app-final
     restart: always
+    environment:
+      - APP_PORT=9001
+      - APP_ENV=Production-Preview
     ports:
       - "9001:9001"
     networks:

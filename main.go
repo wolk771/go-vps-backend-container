@@ -3,15 +3,20 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 )
 
 func main() {
+	// Port aus Umgebungsvariable lesen, Standard ist 9001
+	port := os.Getenv("APP_PORT")
+	if port == "" {
+		port = "9001"
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hallo! Dieser Go-Server nutzt Port 9001 und läuft stabil auf dem VPS! An internes Network angebunden. Jenkins Webhook von main-Zweig.")
+		fmt.Fprintf(w, "EduBookingHub Pilot: Go-Backend ist bereit.\nStatus: Operationell via Jenkins CI/CD.\nUmgebung: %s", os.Getenv("APP_ENV"))
 	})
 
-	// Port 9001 für VPS
-	port := ":9001"
-	fmt.Println("Go-App startet auf Port", port)
-	http.ListenAndServe(port, nil)
+	fmt.Printf("Server startet auf Port %s...\n", port)
+	http.ListenAndServe(":"+port, nil)
 }
