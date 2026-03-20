@@ -1,7 +1,7 @@
 services:
   go-app:
     build: .
-    image: localhost/go-app-v2:latest
+    image: go-app-v2:latest
     container_name: go-app-final
     restart: always
     ports:

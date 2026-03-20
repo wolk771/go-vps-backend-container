@@ -17,9 +17,10 @@ pipeline {
             when { branch 'main' }
             steps {
                 // Den alten Port-Besetzer wegräumen 
-                sh 'podman-compose down'
+                sh 'podman-compose -f docker-compose.yml down || true'
+                sh 'podman-compose -f docker-compose.yml build --no-cache'
                 // Finales Hochfahren und --force-recreate
-                sh 'podman-compose up -d --force-recreate'
+                sh 'podman-compose -f docker-compose.yml up -d --force-recreate'
             }
         }
     }
