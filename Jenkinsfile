@@ -18,9 +18,9 @@ pipeline {
             steps {
                 // Den alten Port-Besetzer wegräumen 
                 sh 'podman stop go-app-final || true'
-                sh 'podman rm go-app-final || true'
-                // Finales Hochfahren
-                sh 'podman-compose up -d --no-build'
+                sh 'podman rm -f go-app-final || true'
+                // Finales Hochfahren und --force-recreate
+                sh 'podman-compose up -d --force-recreate'
             }
         }
     }
