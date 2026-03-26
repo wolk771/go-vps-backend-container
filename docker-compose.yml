@@ -8,7 +8,7 @@ services:
       - APP_PORT=9001
       - APP_ENV=Production-Preview
     ports:
-      - "9001:9001"
+      - "127.0.0.1:9001:9001"
     networks:
       - dev_edu-network-dev
 
